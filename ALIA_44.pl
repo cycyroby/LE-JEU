@@ -87,7 +87,7 @@ jouerCoup(Plateau, Coup, NouveauPlateau, Joueur) :-
     largeur_plateau(L),
     nth0(Coup, Plateau, Case, Reste),
     nonvar(Case),
-    nth0(Coup, NouveauPlateau, Joueur, Reste),
+    nth0(Coup, NouveauPlateau, Case, Reste),
     NextCoup is Coup+L,
     jouerCoup(Plateau, NextCoup, NouveauPlateau, Joueur).
 
@@ -103,6 +103,7 @@ jouer(Joueur) :-
     affichePlateau,
     write('New turn for: '), writeln(Joueur),
     ia(Plateau, Coup, Joueur),
+    %read(Coup),
     jouerCoup(Plateau, Coup, NouveauPlateau, Joueur),
     appliquer(Plateau, NouveauPlateau),
     (   gagne(NouveauPlateau, Gagnant)
@@ -116,22 +117,59 @@ jouer(Joueur) :-
 % On lance le jeu
 go :-
     retractall(plateau(_)), % permet de relancer go plusieurs fois
-    length(L, 42),           % tableau de 42 variables
+    largeur_plateau(Largeur),
+    hauteur_plateau(Hauteur),
+    TaillePlateau is Largeur*Hauteur,
+    length(L, TaillePlateau),           % tableau de 42 variables (6*7)
     assert(plateau(L)),
-    jouer(x).
+    jouer(r).
 
+%-----------------------------tests----------------------------
 testAffichage :-
-  length(P, 42),
+  retractall(plateau(_)),
+  largeur_plateau(Largeur),
+  hauteur_plateau(Hauteur),
+  TaillePlateau is Largeur*Hauteur,
+  length(P, TaillePlateau),
   assert(plateau(P)),
   affichePlateau,
-  affichePlateau.
+  affichePlateau
+  .
 
 testJouer :-
-  length(P, 42),
+  retractall(plateau(_)),
+  largeur_plateau(Largeur),
+  hauteur_plateau(Hauteur),
+  TaillePlateau is Largeur*Hauteur,
+  length(P, TaillePlateau),
   assert(plateau(P)),
   affichePlateau,
-  jouerCoup(Plateau, 1, NouveauPlateau, j),
-  appliquer(Plateau, NouveauPlateau),
+  jouerCoup(P, 1, NouveauPlateau, j),
+  appliquer(P, NouveauPlateau),
   affichePlateau
-.
+  .
+
+testJouer2 :-
+  retractall(plateau(_)),
+  largeur_plateau(Largeur),
+  hauteur_plateau(Hauteur),
+  TaillePlateau is Largeur*Hauteur,
+  length(P, TaillePlateau),
+  assert(plateau(P)),
+  affichePlateau,
+  writeln('j in 1'),
+  jouerCoup(P, 1, NouveauPlateau, j),
+  appliquer(P, NouveauPlateau),
+  affichePlateau,
+  writeln('r in 1'),
+  plateau(P1),
+  jouerCoup(P1, 1, NouveauPlateau, r),
+  appliquer(P1, NouveauPlateau),
+  affichePlateau,
+  writeln('j in 2'),
+  plateau(P2),
+  jouerCoup(P2, 2, NouveauPlateau, j),
+  appliquer(P2, NouveauPlateau),
+  affichePlateau
+  .
 %read pour si on veut jouer
